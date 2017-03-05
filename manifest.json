@@ -1,0 +1,35 @@
+{
+  "name": "Copy Agent",
+  "description": "Easily fill out forms with data from any other web page.",
+  "version": "0.0.0",
+  "manifest_version": 2,
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "copy/paste"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ],
+  "options_ui": {
+    "chrome_style": true,
+    "page": "options.html"
+  },
+  "permissions": [
+    "activeTab",
+    "*://*/*",
+    "storage"
+  ]
+}
