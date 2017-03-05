@@ -1,18 +1,20 @@
 var defaultSchema = {
     "schema-version": 1,
+    "author": "example",
+    "description": "example",
     "sites": {
         "github": {
-            "url-regex": "http?://github.com/*",
-            "get": {
+            "url-regex": "https?:\/\/github.com\/*",
+            "copy": {
                 "title": {
                     "selectors": [".js-issue-title"],
-                    "attribute": "textContent"
+                    "value-attribute": "textContent"
                 }
             },
-            "set": {
-                "phone": {
+            "paste": {
+                "title": {
                     "selectors": ["#new_comment_field"],
-                    "attribute": "textContent"
+                    "value-attribute": "value"
                 }
             }
         }
@@ -20,16 +22,20 @@ var defaultSchema = {
 };
 
 
+/**
+ * Read schema from options menu and persist to storage.sync.
+ */
 function save() {
 	var schemaRaw = document.getElementById('copy-agent-schema').value;
     var schema = JSON.parse(schemaRaw);
 
+    // callback on after sync.set
     function onComplete() {
         var err = chrome.runtime.lastError;
         var status = document.getElementById('status');
 
         status.textContent = err || 'Options saved.';
-        chrome.runtime.lastError = null;
+        delete chrome.runtime.lastError;
 
         setTimeout(function() {
             status.textContent = '';
@@ -40,13 +46,16 @@ function save() {
 }
 
 
+/**
+ * Read schema from storage.sync and write to options menu.
+ */
 function restore() {
+    // callback on after sync.get
     function onComplete(data) {
-        console.log('restore complete')
         var err = chrome.runtime.lastError;
         var schemaString = err || JSON.stringify(data['copy-agent-schema'], null, 2);
 
-        chrome.runtime.lastError = null;
+        delete chrome.runtime.lastError;
 		document.getElementById('copy-agent-schema').value = schemaString;
     }
 

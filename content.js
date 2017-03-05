@@ -11,33 +11,45 @@ function dispatch(msg, sender, sendResponse) {
 
 
 function copy(msg, sendResponse) {
-    console.log('copy');
+    var state = {};
 
-    var spans = document.body.getElementsByTagName('span');
-    msg.userInfo = {};
+    for (var key in msg.selectors) {
+        var selectors = msg.selectors && msg.selectors[key] && msg.selectors[key].selectors;
 
-    for (var i = 0; i < spans.length; i++) {
-      var span = spans[i];
-      var val = span.getAttribute('editable-text');
+        selectors.forEach(function(selector) {
+            var el = document.body.querySelector(selector);
+            var valueAttribute = msg.selectors[key]['value-attribute'] || DEFAULT_VALUE_ATTR;
+            var value = el[valueAttribute];
 
-      switch (val) {
-        case 'user.firstName':
-          msg.userInfo.firstName = span.textContent.trim();
-          break;
-        case 'user.lastName':
-          msg.userInfo.lastName = span.textContent.trim();
-          break;
-      }
+            if (value) {
+                state[key] = value.trim(); 
+                return;
+            }
+        });
     }
 
-    sendResponse(msg);
+    sendResponse(state);
 }
 
 
 function paste(msg, sendResponse) {
-    sendResponse(msg);
+    for (var key in msg.state) {
+        var selectors = msg.selectors && msg.selectors[key] && msg.selectors[key].selectors;
+        if (!selectors) {
+            break;
+        }
+        selectors.forEach(function(selector) {
+            var el = document.body.querySelector(selector);
+            var valueAttribute = msg.selectors[key]['value-attribute'] || DEFAULT_VALUE_ATTR;
+            var value = msg.state[key];
+
+            el[valueAttribute] = msg.state[key];
+        });
+    }
+
+    var emptyState = {};
+    sendResponse(emptyState);  // reset state
 }
 
 
 chrome.runtime.onMessage.addListener(dispatch);
-console.log('workflow-agent active');
