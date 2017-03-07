@@ -14,7 +14,7 @@ function copy(msg, sendResponse) {
     var state = {};
 
     for (var key in msg.selectors) {
-        var selectors = msg.selectors && msg.selectors[key] && msg.selectors[key].selectors;
+        var selectors = msg.selectors[key].selectors;
 
         selectors.forEach(function(selector) {
             var el = document.body.querySelector(selector);
@@ -42,14 +42,16 @@ function paste(msg, sendResponse) {
     for (var key in msg.state) {
         var selectors = msg.selectors && msg.selectors[key] && msg.selectors[key].selectors;
         if (!selectors) {
-            break;
+            continue;
         }
         selectors.forEach(function(selector) {
-            var elements = document.body.querySelector(selector);
-            var valueAttribute = msg.selectors[key]['value-attribute'] || 'value';
-            var value = msg.state[key];
+            var el = document.body.querySelector(selector);
 
-            el[valueAttribute] = msg.state[key];
+            if (el) {
+                var valueAttribute = msg.selectors[key]['value-attribute'] || 'value';
+                var value = msg.state[key];
+                el[valueAttribute] = msg.state[key];
+            }
         });
     }
 
