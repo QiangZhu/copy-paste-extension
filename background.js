@@ -27,6 +27,8 @@ function onBrowserAction() {
 
     function updateState(newState) {
         state = newState;
+        console.log('copy agent state updated');
+        console.log(state);
     }
 
     loadSchema(function(err, schema) {
